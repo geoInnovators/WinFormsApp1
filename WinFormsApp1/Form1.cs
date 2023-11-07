@@ -14,13 +14,13 @@ namespace WinFormsApp1
 
         }
 
-        public List<Person> persons;
+        public PersonManager personmanager = new PersonManager(new FileStorageRepository());
 
+        // load
         private void button1_Click(object sender, EventArgs e)
         {
-            var text = File.ReadAllText(@".\Persons.json");
-            persons = JsonConvert.DeserializeObject<List<Person>>(text);
-            dataGridView1.DataSource = persons;
+            personmanager.Load();
+            dataGridView1.DataSource = personmanager.persons;
         }
 
         private void dataGridView1_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
@@ -40,14 +40,13 @@ namespace WinFormsApp1
             if (result == DialogResult.OK)
             {
                 var person = modal.NewPerson;
-                person.Id = persons.Max(x => x.Id) + 1;
+                personmanager.Add(person);
+
                 var image = modal.Image;
-                persons.Add(person);
-                File.WriteAllText(@".\Persons.json", JsonConvert.SerializeObject(persons));
                 image.Save(@$".\Images\{person.Id}.jpg");
 
                 dataGridView1.DataSource = null;
-                dataGridView1.DataSource = persons;
+                dataGridView1.DataSource = personmanager.persons;
             }
         }
     }
